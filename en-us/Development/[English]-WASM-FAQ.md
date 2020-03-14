@@ -23,7 +23,7 @@
     Generate ABI supported types and conversion rules as follows:
 
     | Type             | ABI          |
-    |:----------------:|:------------:|
+    |------------------|--------------|
     | bool             | bool         |
     | uint8_t          | uint8        |
     | uint16_t         | uint16       |
