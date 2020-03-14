@@ -25,14 +25,14 @@
     | Type             | ABI          |
     |------------------|--------------|
     | bool             | bool         |
-    | uint8_t          | uint8        |
-    | uint16_t         | uint16       |
-    | uint32_t         | uint32       |
-    | uint64_t         | uint64       |
-    | int8_t           | int8         |
-    | int16_t          | int16        |
-    | int32_t          | int32        |
-    | int64_t          | int64        |
+    | uint8\_t         | uint8        |
+    | uint16\_t        | uint16       |
+    | uint32\_t        | uint32       |
+    | uint64\_t        | uint64       |
+    | int8\_t          | int8         |
+    | int16\_t         | int16        |
+    | int32\_t         | int32        |
+    | int64\_t         | int64        |
     | bytes            | uint8[]      |
     | std::string      | string       |
     | std::vector<T>   | T[]          |
