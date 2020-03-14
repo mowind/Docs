@@ -6,7 +6,7 @@
     platon-cpp ./test.cpp ./test1.cpp
     ```
 
-    只允许存在一个合约类.
+    只允许存在一个合约类。
 
 2. 使用 `platon-cpp` 编译合约, 如何指定wasm输出目录及文件名?
 
@@ -15,13 +15,13 @@
     ```shell
     platon-cpp ./test.cpp -o ./out/test.wasm
     ```
-3. platon-truffle执行truffle deploy部署合约失败
+3. platon-truffle执行truffle deploy部署合约失败？
 
-  确认truffle-config.js中连接的链的配制信息及用户的钱包地址是否正确,钱包是否解锁
+  确认truffle-config.js中连接的链的配制信息及用户的钱包地址是否正确,钱包是否解锁。
 
-4. truffle 部署带参数的构造函数合约失败
+4. truffle 部署带参数的构造函数合约失败？
 
-   如果合约中的init函数带有参数，部署合约时需要指定params参数	
+   如果合约中的init函数带有参数，部署合约时需要指定params参数。	
 	
 5. ABI 支持哪些数据类型?
 
