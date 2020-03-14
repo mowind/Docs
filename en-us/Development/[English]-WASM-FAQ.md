@@ -22,11 +22,11 @@
 
     Generate ABI supported types and conversion rules as follows:
 
-    | Type             | ABI          |
-    |------------------|--------------|
-    | bool             | bool         |
-    | u128             | uint128      |
-    | bigint           | uint128      |
+| Type             | ABI          |
+|------------------|--------------|
+| bool             | bool         |
+| u128             | uint128      |
+| bigint           | uint128      |
 
 ## About Contract
 
