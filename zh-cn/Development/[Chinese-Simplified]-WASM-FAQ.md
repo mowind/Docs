@@ -21,34 +21,35 @@
 
 4. truffle 部署带参数的构造函数合约失败？
 
-   如果合约中的init函数带有参数，部署合约时需要指定params参数。	
-	
+
+   如果合约中的init函数带有参数，部署合约时需要指定params参数。
+
 5. ABI 支持哪些数据类型?
 
     生成ABI支持的类型和转换规则如下：
 
-    | 类型             | ABI          |
-    |:----------------:|:------------:|
-    | bool             | bool         |
-    | uint8_t          | uint8        |
-    | uint16_t         | uint16       |
-    | uint32_t         | uint32       |
-    | uint64_t         | uint64       |
-    | int8_t           | int8         |
-    | int16_t          | int16        |
-    | int32_t          | int32        |
-    | int64_t          | int64        |
-    | bytes            | uint8[]      |
-    | std::string      | string       |
-    | std::vector<T>   | T[]          |
-    | std::array[T, N] | T[N]         |
-    | std::pair<T, U>  | pair<T, U    |
-    | std::set<T>      | set<T>       |
-    | std::map<T, V>   | map<T, V>    |
-    | std::list<T>     | list<T>      |
-    | FixedHash<N>     | FixedHash<N> |
-    | u128             | uint128      |
-    | bigint           | uint128      |
+| 类型             | ABI          |
+|------------------|--------------|
+| bool             | bool         |
+| uint8\_t         | uint8        |
+| uint16\_t        | uint16       |
+| uint32\_t        | uint32       |
+| uint64\_t        | uint64       |
+| int8\_t          | int8         |
+| int16\_t         | int16        |
+| int32\_t         | int32        |
+| int64\_t         | int64        |
+| bytes            | uint8\[\]      |
+| std::string      | string       |
+| std::vector<T>   | T\[\]          |
+| std::array\[T, N\] | T\[N\]         |
+| std::pair<T, U>  | pair<T, U    |
+| std::set<T>      | set<T>       |
+| std::map<T, V>   | map<T, V>    |
+| std::list<T>     | list<T>      |
+| FixedHash<N>     | FixedHash<N> |
+| u128             | uint128      |
+| bigint           | uint128      |
 
 
 ## 合约相关
