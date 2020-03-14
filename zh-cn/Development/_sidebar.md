@@ -1,6 +1,7 @@
 - [Solidy智能合约开发](/zh-cn/Development/[Chinese-Simplified]-智能合约开发.md)     
         - [简介](/zh-cn/Development/[Chinese-Simplified]-简介.md)
 	- [入门](/zh-cn/Development/[Chinese-Simplified]-智能合约开发入门手册.md)
+	- [入门](/zh-cn/Development/[Chinese-Simplified]-智能合约开发入门手册.md)
 	- [合约迁移](/zh-cn/Development/[Chinese-Simplified]-迁移以太坊合约.md)
 	- [众筹合约](/zh-cn/Development/[Chinese-Simplified]-众筹合约.md)
 	- [合约开发成本](/zh-cn/Development/[Chinese-Simplified]-合约开发成本.md)
