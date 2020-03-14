@@ -1,19 +1,5 @@
 ## 简介
 
-合约，就是一段程序，并且是一段能在区块链上运行的程序。智能合约有以下特性：
-
-- 任何人都可以在区块链上开发智能合约，这些智能合约的代码是存在于区块链的账户中的，这类存有代码的账户叫合约账户。对应地，由密钥控制的账户可称为外部账户。
-- 合约账户不能自己启动运行自己的智能合约。要运行一个智能合约，需要由外部账户对合约账户发起交易，从而启动其中的代码的执行。
-
-Solidity语言是一种面向合约的、为实现智能合约而创建的高级编程语言,其语法类似JavaScript的高级编程语言。被设计成以编译的方式生成虚拟机代码。使用它很容易创建智能合约。但作为一种真正意义上运行在互联网上的去中心化智能合约其又有以下特点：
-
-- PlatON底层是基于帐户，Solidity语言提供有一个特殊的Address类型。用于定位用户账号，定位智能合约，定位智能合约的代码。
-- 由于Solidity语言内嵌框架是支持支付的，并且提供了一些关键字，如payable，可以在Solidity语言层面直接支持支付，用起来十分简单。
-- 数据存储是使用网络上的区块链，数据的每一个状态都可以永久存储，所以Solidity语言在开发时需要确定变量是使用内存，还是区块链。
-- Solidity运行环境是在一个去中心化的网络上，特别强调以太坊智能合约或函数执行的调用方式。因为原来一个简单的函数调用变为了一个网络上的节点代码执行，完全是分布式的编程环境。
-- Solidity语言的异常机制也很不一样，一旦出现异常，所有的执行都将会被回撤，这主要是为了保证智能合约执行的原子性，以避免中间状态出现的数据不一致。
-
-
 本教程主要是指导用户在PlatON上使用solidity语言创建简单的HelloWorld智能合约，通过platon-truffle编译，部署，调用此合约。如果您想使用更加丰富的API可以参考[Java SDK开发指南](/zh-cn/Development/[Chinese-Simplified]-Java-SDK.md) 或者 [JS SDK开发指南](/zh-cn/Development/[Chinese-Simplified]-JS-SDK.md)
 
 - solidity智能合约语法请参考[Solidity官方文档](https://solidity.readthedocs.io/en/develop/)
@@ -23,7 +9,7 @@ Solidity语言是一种面向合约的、为实现智能合约而创建的高级
 
 platon-truffle是PlatON提供的一款能够在本地编译、部署、调用智能合约的工具，具体的安装及使用手册参见
 
-- platon-truffle开发工具[安装参考](https://github.com/PlatONnetwork/platon-truffle/tree/feature/evm)
+- platon-truffle开发工具[安装参考](https://github.com/PlatONnetwork/platon-truffle/tree/feature/wasm)
 - platon-truffle开发工具[使用手册](https://platon-truffle.readthedocs.io/en/v0.1.0/index.html)
 
 
@@ -259,54 +245,3 @@ helloWorld.methods.getName().call(null,function(error,result){console.log("name 
 - `getName` 是我们HelloWorld合约中的一个方法，该方法没有入参，故入参为空
 - `call` 指明是查询方法
 - `function` 是一个回调函数，将处理调用后的结果，此处我们通过console.log打印出执行结果
-
-## FAQ 
-
-> 问: platon-truffle有哪些命令如何使用？
-
-> 答: platon-truffle开发使用手册[参考这里](https://platon-truffle.readthedocs.io/en/v0.1.0/index.html)
-
-
-
-
-> 问: 合约为什么语法校验通不过？
-
-> 答: solidity合约0.4.x版本与0.5.x版本有重大变更，具体语法[参考这里](https://solidity.readthedocs.io/en/develop/)
-
-
-
-> 问:  platon-truffle执行truffle compile 失败?
-
-> 答:  1.确认编译的合约文件中的版本号与truffle-config.js中指定的版本号是否一致
->           2.可能语法有误，可以根据命令行提示修复后再进行编译
-
-
-
-> 问: platon-truffle执行truffle migrate部署合约失败
-
-> 答: 1.确认truffle-config.js中连接的链的配制信息及用户的钱包地址是否正确
-
-
-
-
-> 问: truffle migrate部署带参数的构造函数合约失败
-
-> 答: 以合约A.sol为例，在migrations/2_initial_A.js文件中，确认是否添加构造参数信息如：
-> A.sol构造函数格式如下：
-> constructor(uint256 a, string memory b, string memory c) public {}
-
-
->2_initial_A.js文件配制如下：
-> 
-> const A = artifacts.require("A");  
-> module.exports = function(deployer) {
->         deployer.deploy(ERC200513Token,100,'PLA','PLAT');//需要传入对应构造函数参数
-> };
-
-
-
-
-
-```
-
-```

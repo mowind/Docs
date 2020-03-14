@@ -15,8 +15,15 @@
     ```shell
     platon-cpp ./test.cpp -o ./out/test.wasm
     ```
+3. platon-truffle执行truffle deploy部署合约失败
 
-3. ABI 支持哪些数据类型?
+  确认truffle-config.js中连接的链的配制信息及用户的钱包地址是否正确,钱包是否解锁
+
+4. truffle 部署带参数的构造函数合约失败
+
+   如果合约中的init函数带有参数，部署合约时需要指定params参数	
+	
+5. ABI 支持哪些数据类型?
 
     生成ABI支持的类型和转换规则如下：
 

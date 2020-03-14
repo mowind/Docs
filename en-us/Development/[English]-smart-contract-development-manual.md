@@ -1,24 +1,5 @@
 ## Introduce
 
-Smart contract, is a program, which can run in the blockchain.Smart contracts have the following characteristics:
-
-* Anybody can develop smart contract , which stored by the contract accout of blockchain.The accout controled by private key is called externel account.
-
-* Contract account cannot run by itself, before executing a smart contract, it need externel account send transaction to contract account.
-	
-
-Solidity language is a contract-oriented high-level programming language created to implement smart contracts. Its syntax is similar to JavaScript's high-level programming language. It is designed to generate virtual machine code in a compiled manner. Using it is easy to create smart contracts. However, as a decentralized smart contract running on the Internet in real sense, it has the following features:
-
-* The PlatON is based on an account model,so solidity provides a special address type, which is used to locate user accounts, locate smart contracts, and locate smart contract codes.
-
-* Because solidity embedded framework supports payment, and provides some keywords, such as payable, it can directly support payment at the Solidity language level, which is very simple to use.
-
-* Data storage uses the blockchain on the network, and every state of the data can be stored permanently, so when developing the solidity contract, it is necessary to determine whether the variable uses memory or the blockchain.
-
-* The solidity operating environment is on a decentralized network, with special emphasis on the way ethereum smart contracts or function execution is called. because a simple function call turned into a node code execution on the network, it is a completely distributed programming environment.
-
-* The abnormality mechanism of the solidity language is also very different. Once an exception occurs, all executions will be retracted. This is mainly to ensure the atomicity of smart contract execution to avoid data inconsistencies in the intermediate state.
-
 This tutorial is mainly to guide users to create a simple HelloWorld smart contract using solidity language on PlatON, compile, deploy, and call this contract through platon-truffle. If you want to use a richer API you can refer to [Java SDK ](/zh-cn/Development/[Chinese-Simplified]-Java-SDK.md) and  [JS SDK](/zh-cn/Development/[Chinese-Simplified]-JS-SDK.md)
 
 ## Platon-truffle Introduce 
@@ -262,42 +243,3 @@ Description：
 - `getName` the function of the HelloWorld contract，which has no  parameter 
 - `call` specify query method
 - `function` callback result,we can use console.log to print info.
-
-## FAQ 
-
-* Q. How many commands in platon-truffle？
-
-> Refer to  platon-truffle develop guide[Reference here](https://platon-truffle.readthedocs.io/en/v0.1.0/index.html)
-
-* Q. Why contract syntax cannot verify?
-
-> Solidity 0.4.x has a great different with 0.5.x，detail info refer to [Reference here](https://solidity.readthedocs.io/en/develop/)
-
-* Q.  Why truffle doesn't compile?
-
-> 1. Confirm the contract version same as the version specified in the truffle-config.js.
-> 2. Contract syntax be writed in a wrong way.
-
-
-* Q. Why the contract can not deploy by truffle migrate?
-
-> 1. Confrim the blockchain network info be configured correctly.
-> 2. Confirm the account address be configured correctly.
-
-* Q. Deploying a contract with a parameter constructor using the command `truffle migrate` failed.
-
-> For example, A.sol 
-
-```
-...
-Constructor(uint256 a, string memory b, string memory c) public {}
-...
-
-```
-> 2_initial_A.js configured as follow：
-```
-const A = artifacts.require("A");  
-module.exports = function(deployer) {
-        deployer.deploy(ERC200513Token,100,'PLA','PLAT');//pass the corresponding construction parameters
-};
-```

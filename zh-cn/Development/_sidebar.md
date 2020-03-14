@@ -5,7 +5,7 @@
 	- [合约开发成本](/zh-cn/Development/[Chinese-Simplified]-合约开发成本.md)
 	- [最佳实践](/zh-cn/Development/[Chinese-Simplified]-最佳实践.md)
 	- [合约安全开发指南](/zh-cn/Development/[Chinese-Simplified]-合约安全开发指南)
-
+	- [FAQ](/zh-cn/Development/[Chinese-Simplified]-FAQ.md)
 - [WASM智能合约开发](/zh-cn/Development/[Chinese-Simplified]-WASM-简介.md)      
 	- [入门](/zh-cn/Development/[Chinese-Simplified]-WASM-入门.md)
 	- [合约开发成本](/zh-cn/Development/[Chinese-Simplified]-WASM-合约开发成本.md)

@@ -5,6 +5,7 @@
 	- [Development Costs](/en-us/Development/[English]-development-costs.md)
 	- [Best Practice](/en-us/Development/[English]-best-practice.md)
 	- [Contract Security Development Guide](/en-us/Development/[English]-Contract-Security-Considerations.md)
+	- [FAQ](/en-us/Development/[English]-FAQ.md)
 - [WASM Smart Contract Development](/en-us/Development/[English]-WASM-Introduce.md)
 	- [Getting Started](/en-us/Development/[English]-WASM-Getting_Started.md)
 	- [Development Costs](/en-us/Development/[English]-WASM-development-costs.md)
