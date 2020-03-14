@@ -35,8 +35,8 @@
     | int64\_t         | int64        |
     | bytes            | uint8\[\]      |
     | std::string      | string       |
-    | std::vector<T>   | T[]          |
-    | std::array[T, N] | T[N]         |
+    | std::vector<T>   | T\[\]          |
+    | std::array\[T, N\] | T\[N\]         |
     | std::pair<T, U>  | pair<T, U    |
     | std::set<T>      | set<T>       |
     | std::map<T, V>   | map<T, V>    |
