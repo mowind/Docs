@@ -167,7 +167,7 @@ bool platon::platon_transfer(const Address &addr, const Energon &amount)
 
 ### platon::Energon Class
 
-Energo是货币先关操作类
+Energo是货币相关操作类
 
 * **公共成员函数**
   * `Energon (u128 n)`
