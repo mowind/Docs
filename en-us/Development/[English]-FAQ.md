@@ -1,4 +1,4 @@
-## FAQ 
+## About Compile
 
 1. How many commands in platon-truffle？
 
@@ -6,7 +6,7 @@
 
 2. Why contract syntax cannot verify?
 
-   Solidity 0.4.x has a great different with 0.5.x，detail info refer to [Reference here](https://solidity.readthedocs.io/en/develop/)
+   Solidity 0.4.x has a great different with 0.5.x，detail info refer to [Reference here](https://solidity.readthedocs.io/en/develop/).
 
 3. Why truffle doesn't compile?
 

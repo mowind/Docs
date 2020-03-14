@@ -21,12 +21,15 @@
 
   以合约A.sol为例，在migrations/2_initial_A.js文件中，确认是否添加构造参数信息如：
   A.sol构造函数格式如下：
+  ```
   constructor(uint256 a, string memory b, string memory c) public {}
+  ```
 
   2_initial_A.js文件配制如下：
-  
+  ```
    const A = artifacts.require("A");  
    module.exports = function(deployer) {
-           deployer.deploy(ERC200513Token,100,'PLA','PLAT');//需要传入对应构造函数参数
+        deployer.deploy(ERC200513Token,100,'PLA','PLAT');//需要传入对应构造函数参数
    };   
+  ```   
 
