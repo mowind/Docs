@@ -1,6 +1,4 @@
-## 简介
-
-WebAssembly（简称 Wasm）是一种为栈式虚拟机设计的二进制指令集。Wasm 被设计为可供类似C/C++/Rust等高级语言的平台编译目标，最初设计目的是解决 JavaScript 的性能问题。Wasm 是由 W3C 牵头正在推进的 Web 标准，并得到了谷歌、微软和 Mozilla 等浏览器厂商的支持。
+## 概要
 
 本教程主要是指导用户在PlatON上使用wasm语言创建简单的HelloWorld智能合约，通过platon-truffle编译，部署，调用此合约。
 
