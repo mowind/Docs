@@ -1,3 +1,4 @@
+
 ## 开发库导入
 
 根据构建工具的不同，使用以下方式将相关依赖项添加到项目中：
@@ -34,7 +35,7 @@ repositories {
 
 > gradle引用方式:
 ```
-compile "com.platon.client:core:0.7.5.1"
+compile "com.platon.client:core:0.8.0.0"
 ```
 
 ## 系统合约调用
@@ -42,6 +43,7 @@ compile "com.platon.client:core:0.7.5.1"
 系统合约主要包含经济模型和治理相关的合约：
 * 质押合约
 * 委托合约
+* 奖励合约
 * 节点合约
 * 治理合约
 * 举报合约
@@ -83,6 +85,7 @@ StakingContract contract = StakingContract.load(web3j, credentials, chainId);
   - ProgramVersion：processVersion  程序的真实版本，治理rpc获取
   - String：blsPubKey   bls的公钥
   - String：blsProof    bls的证明，治理rpc获取
+  - BigInteger：rewardPer   委托所得到的奖励分成比例，1=0.01%   10000=100%
 
 * **返回值**
 
@@ -107,6 +110,7 @@ String nodeName = "integration-node1";
 String webSite = "https://www.platon.network/#/";
 String details = "integration-node1-details";
 String blsPubKey = "5ccd6b8c32f2713faa6c9a46e5fb61ad7b7400e53fabcbc56bdc0c16fbfffe09ad6256982c7059e7383a9187ad93a002a7cda7a75d569f591730481a8b91b5fad52ac26ac495522a069686df1061fc184c31771008c1fedfafd50ae794778811";
+BigInteger rewardPer = BigInteger.valueOf(1000L);
 
 PlatonSendTransaction platonSendTransaction = stakingContract.stakingReturnTransaction(new StakingParam.Builder()
         .setNodeId(nodeId)
@@ -120,6 +124,7 @@ PlatonSendTransaction platonSendTransaction = stakingContract.stakingReturnTrans
         .setBlsPubKey(blsPubKey)
         .setProcessVersion(web3j.getProgramVersion().send().getAdminProgramVersion())
         .setBlsProof(web3j.getSchnorrNIZKProve().send().getAdminSchnorrNIZKProve())
+        .setRewardPer(rewardPer)
         .build()).send();
 TransactionResponse baseResponse = stakingContract.getTransactionResponse(platonSendTransaction).send();
 ```
@@ -164,6 +169,7 @@ TransactionResponse baseResponse = stakingContract.getTransactionResponse(platon
   - String：nodeName   被质押节点的名称
   - String：webSite   节点的第三方主页(有长度限制，表示该节点的主页)
   - String：details   节点的描述(有长度限制，表示该节点的描述)
+  - BigInteger：rewardPer   委托所得到的奖励分成比例，1=0.01%   10000=100%
 
 * **返回值**
 
@@ -185,6 +191,7 @@ String externalId = "";
 String nodeName = "integration-node1-u";
 String webSite = "https://www.platon.network/#/";
 String details = "integration-node1-details-u";
+BigInteger rewardPer = BigInteger.valueOf(1000L);
 
 PlatonSendTransaction platonSendTransaction = stakingContract.updateStakingInfoReturnTransaction(new UpdateStakingParam.Builder()
         .setBenifitAddress(benifitAddress)
@@ -193,6 +200,7 @@ PlatonSendTransaction platonSendTransaction = stakingContract.updateStakingInfoR
         .setNodeName(nodeName)
         .setWebSite(webSite)
         .setDetails(details)
+        .setRewardPer(rewardPer)
         .build()).send();
 TransactionResponse baseResponse = stakingContract.getTransactionResponse(platonSendTransaction).send();
 ```
@@ -283,6 +291,18 @@ CallResponse<Node> baseRespons
   - BigInteger：ValidatorTerm   验证人的任期
 
   - String：Website   节点的第三方主页(有长度限制，表示该节点的主页)
+  
+  - BigInteger：delegateEpoch  节点最后一次被委托的结算周期
+  
+  - BigInteger：delegateTotal  节点被委托的生效总数量
+  
+  - BigInteger：delegateTotalHes  节点被委托的未生效总数量
+  
+  - BigInteger：delegateRewardTotal  候选人当前发放的总委托奖励
+  
+  - BigInteger：nextRewardPer 下一个结算周期奖励分成比例
+  
+  - BigInteger：rewardPer 当前结算周期奖励分成比例
 
 * **Java SDK合约使用**
 
@@ -475,6 +495,7 @@ CallResponse<Delegation>
   - BigInteger：RestrictingPlan   发起委托账户的锁仓金额的锁定期委托的VON
   - BigInteger：RestrictingPlanHes   发起委托账户的锁仓金额的犹豫期质押的VON
   - BigInteger：Reduction   处于撤销计划中的VON
+  - BigInteger：cumulativeIncome  待领取的委托收益
 
 * **Java SDK合约使用**
 
@@ -506,16 +527,106 @@ TransactionResponse
 	- int：code   结果标识，0为成功
 	- String：errMsg   错误信息，失败时存在
 	- TransactionReceipt：transactionReceipt  交易的回执
+	
+* **解交易回执**
+
+   - BigInteger：reward   获得解除委托时所提取的委托收益
+
+* **合约使用**
+  
+   ```java
+   String nodeId = "77fffc999d9f9403b65009f1eb27bae65774e2d8ea36f7b20a89f82642a5067557430e6edfe5320bb81c3666a19cf4a5172d6533117d7ebcd0f2c82055499050";
+   BigDecimal stakingAmount = Convert.toVon("500000", Unit.LAT);
+   BigInteger stakingBlockNum = new BigInteger("12134");
+   
+   PlatonSendTransaction platonSendTransaction = delegateContract.unDelegateReturnTransaction(nodeId, stakingBlockNum, stakingAmount.toBigInteger()).send();
+   TransactionResponse baseResponse = delegateContract.getTransactionResponse(platonSendTransaction).send();
+   
+   if(baseResponse.isStatusOk()){ 
+       BigInteger reward = delegateContract.decodeUnDelegateLog(baseResponse.getTransactionReceipt());
+   }
+   ```
+
+### 奖励相关接口
+
+> PlatON经济模型中奖励相关的合约接口
+
+#### 加载奖励合约
+
+```java
+//Java 8
+Web3j web3j = Web3j.build(new HttpService("http://localhost:6789"));
+String chainId = "100";
+Credentials credentials = WalletUtils.loadCredentials("password", "/path/to/walletfile");
+RewardContract rewardContract = RewardContract.load(web3j, deleteCredentials, chainId);
+```
+
+#### 接口说明
+
+##### **withdrawDelegateReward**
+
+> 提取账户当前所有的可提取的委托奖励 
+
+* **入参**
+
+  无
+
+* **返回值**
+
+```java
+TransactionResponse
+```
+
+- TransactionResponse： 通用应答包
+	- int：code   结果标识，0为成功
+	- String：errMsg   错误信息，失败时存在
+	- TransactionReceipt：transactionReceipt  交易的回执
+	
+* **解交易回执**
+   - String：nodeId    节点ID
+   - BigInteger：stakingNum  节点的质押块高
+   - BigInteger：reward  领取到的收益
 
 * **合约使用**
 
 ```java
-String nodeId = "77fffc999d9f9403b65009f1eb27bae65774e2d8ea36f7b20a89f82642a5067557430e6edfe5320bb81c3666a19cf4a5172d6533117d7ebcd0f2c82055499050";
-BigDecimal stakingAmount = Convert.toVon("500000", Unit.LAT);
-BigInteger stakingBlockNum = new BigInteger("12134");
+PlatonSendTransaction platonSendTransaction = rewardContract.withdrawDelegateRewardReturnTransaction().send();
+TransactionResponse baseResponse = rewardContract.getTransactionResponse(platonSendTransaction).send();
+if(baseResponse.isStatusOk()){
+    List<Reward> rewardList = rewardContract.decodeWithdrawDelegateRewardLog(baseResponse.getTransactionReceipt());
+}
+```
 
-PlatonSendTransaction platonSendTransaction = delegateContract.unDelegateReturnTransaction(nodeId, stakingBlockNum, stakingAmount.toBigInteger()).send();
-TransactionResponse baseResponse = delegateContract.getTransactionResponse(platonSendTransaction).send();
+##### **getDelegateReward**
+
+> 查询当前账号可提取奖励明细
+
+* **入参**
+  - String：address   委托人的账户地址
+  - List<String>： nodeList  节点列表，如果为空查全部
+
+* **返回值**
+
+```java
+CallResponse<List<Reward>> baseRespons
+```
+
+- CallResponse<List<Reward>>描述
+	- int：code   结果标识，0为成功
+	- List<Reward>：data   Reward对象列表
+	- String：errMsg   错误信息，失败时存在
+
+* **Reward**：奖励明细
+   - String：nodeId    节点ID
+   - BigInteger：stakingNum  节点的质押块高
+   - BigInteger：reward  领取到的收益
+
+* **Java SDK合约使用**
+
+```java
+List<String> nodeList = new ArrayList<>();
+nodeList.add(nodeId);
+CallResponse<List<Reward>> baseResponse = rewardContract.getDelegateReward(delegateAddress, nodeList).send();
 ```
 
 ### 节点相关合约
@@ -591,6 +702,14 @@ CallResponse<List<Node>> baseResponse
 
   - String：Website   节点的第三方主页(有长度限制，表示该节点的主页)
 
+  - BigInteger：delegateTotal  节点被委托的生效总数量
+
+  - BigInteger：delegateRewardTotal  候选人当前发放的总委托奖励
+
+  - BigInteger：nextRewardPer 下一个结算周期奖励分成比例
+
+  - BigInteger：rewardPer 当前结算周期奖励分成比例
+
 * **Java SDK合约使用**
 
 ```java
@@ -650,6 +769,14 @@ CallResponse<List<Node>> baseResponse
   - BigInteger：ValidatorTerm   验证人的任期
 
   - String：Website   节点的第三方主页(有长度限制，表示该节点的主页)
+
+  - BigInteger：delegateTotal  节点被委托的生效总数量
+
+  - BigInteger：delegateRewardTotal  候选人当前发放的总委托奖励
+
+  - BigInteger：nextRewardPer 下一个结算周期奖励分成比例
+
+  - BigInteger：rewardPer 当前结算周期奖励分成比例
 
 * **Java SDK合约使用**
 
@@ -713,6 +840,18 @@ CallResponse<List<Node>> baseResponse
   - BigInteger：ValidatorTerm   验证人的任期
 
   - String：Website   节点的第三方主页(有长度限制，表示该节点的主页)
+
+  - BigInteger：delegateEpoch  节点最后一次被委托的结算周期
+  
+  - BigInteger：delegateTotal  节点被委托的生效总数量
+  
+  - BigInteger：delegateTotalHes  节点被委托的未生效总数量
+  
+  - BigInteger：delegateRewardTotal  候选人当前发放的总委托奖励
+  
+  - BigInteger：nextRewardPer 下一个结算周期奖励分成比例
+  
+  - BigInteger：rewardPer 当前结算周期奖励分成比例
 
 * **Java SDK合约使用**
 
@@ -869,6 +1008,7 @@ CallResponse<Proposal> baseResponse = proposalContract.getProposal(proposalID).s
   - String：proposalID   提案ID
 
 * **返回值**
+
 ```java
 CallResponse<TallyResult>
 ```
@@ -949,7 +1089,8 @@ CallResponse<List<Proposal>> baseResponse = proposalContract.getProposalList().s
   - String：verifier   声明的节点，只能是验证人/候选人
 
 * **返回值**
-```
+
+```java
 TransactionResponse
 ```
 
@@ -977,7 +1118,8 @@ TransactionResponse baseResponse = proposalContract.getTransactionResponse(plato
   无
 
 * **返回值**
-```
+
+```java
 CallResponse
 ```
 
@@ -1119,6 +1261,7 @@ TransactionResponse baseResponse = restrictingPlanContract.getTransactionRespons
 > 获取锁仓计划
 
 * **入参**
+
   - String：address   锁仓释放到账账户
 
 * **返回值**
@@ -1545,6 +1688,7 @@ BigInteger req = request.send().getTransactionCount();
       -  DefaultBlockParameter.valueOf(BigInteger blockNumber) 指定块高
 
 * **返回值**
+
 ```java
 Request<?, PlatonGetCode>
 ```
@@ -2193,68 +2337,111 @@ result为证据字符串，包含3种证据类型，分别是：duplicatePrepare
 
 * **duplicatePrepare**
 
-```json
+```text
 {
-    "prepare_a":{
-        "epoch":0, 			//共识轮epoch值
-        "view_number":0,	//共识轮view值
-        "block_hash":"0xf41006b64e9109098723a37f9246a76c236cd97c67a334cfb4d54bc36a3f1306",
-        //区块hash
-        "block_number":500,		//区块number
-        "block_index":0,		//区块在一轮view中的索引值
-        "validate_node":{
-            "index":0,			//验证人在一轮epoch中的索引值
-            "address":"0x0550184a50db8162c0cfe9296f06b2b1db019331",		//验证人地址
-            "NodeID":"77fffc999d9f9403b65009f1eb27bae65774e2d8ea36f7b20a89f82642a5067557430e6edfe5320bb81c3666a19cf4a5172d6533117d7ebcd0f2c82055499050",		//验证人nodeID
-            "blsPubKey":"5ccd6b8c32f2713faa6c9a46e5fb61ad7b7400e53fabcbc56bdc0c16fbfffe09ad6256982c7059e7383a9187ad93a002a7cda7a75d569f591730481a8b91b5fad52ac26ac495522a069686df1061fc184c31771008c1fedfafd50ae794778811"		//验证人bls公钥
-        },
-        "signature":"0xa7205d571b16696b3a9b68e4b9ccef001c751d860d0427760f650853fe563f5191f2292dd67ccd6c89ed050182f19b9200000000000000000000000000000000"	//消息签名
-    }
- }
+  "prepareA": {
+    "epoch": 0,            //共识轮epoch值
+    "viewNumber": 0,       //共识轮view值
+    "blockHash": "0x06abdbaf7a0a5cb1deddf69de5b23d6bc3506fdadbdcfc32333a1220da1361ba",    //区块hash
+    "blockNumber": 16013,       //区块number
+    "blockIndex": 0,        //区块在一轮view中的索引值
+    "blockData": "0xe1a507a57c1e9d8cade361fefa725d7a271869aea7fd923165c872e7c0c2b3f2",     //区块rlp编码值
+    "validateNode": {            
+      "index": 0,     //验证人在一轮epoch中的索引值
+      "address": "0xc30671be006dcbfd6d36bdf0dfdf95c62c23fad4",    //验证人地址
+      "nodeId": "19f1c9aa5140bd1304a3260de640a521c33015da86b88cd2ecc83339b558a4d4afa4bd0555d3fa16ae43043aeb4fbd32c92b34de1af437811de51d966dc64365",    //验证人nodeID
+      "blsPubKey": "f93a2381b4cbb719a83d80a4feb93663c7aa026c99f64704d6cc464ae1239d3486d0cf6e0b257ac02d5dd3f5b4389907e9d1d5b434d784bfd7b89e0822148c7f5b8e1d90057a5bbf4a0abf88bbb12902b32c94ca390a2e16eea8132bf8c2ed8f"    //验证人bls公钥
+    },
+    "signature": "0x1afdf43596e07d0f5b59ae8f45d30d21a9c5ac793071bfb6382ae151081a901fd3215e0b9645040c9071d0be08eb200900000000000000000000000000000000"     //消息签名
+  },
+  "prepareB": {
+    "epoch": 0,
+    "viewNumber": 0,
+    "blockHash": "0x74e3744545e95f4defc82d731504a39994b8013575491f83f7520cf796347b8f",
+    "blockNumber": 16013,
+    "blockIndex": 0,
+    "blockData": "0xb11be0a3634e29281403d690c1a0bc38e96ea34b3aea0b0da2883800f610c3b7",
+    "validateNode": {
+      "index": 0,
+      "address": "0xc30671be006dcbfd6d36bdf0dfdf95c62c23fad4",
+      "nodeId": "19f1c9aa5140bd1304a3260de640a521c33015da86b88cd2ecc83339b558a4d4afa4bd0555d3fa16ae43043aeb4fbd32c92b34de1af437811de51d966dc64365",
+      "blsPubKey": "f93a2381b4cbb719a83d80a4feb93663c7aa026c99f64704d6cc464ae1239d3486d0cf6e0b257ac02d5dd3f5b4389907e9d1d5b434d784bfd7b89e0822148c7f5b8e1d90057a5bbf4a0abf88bbb12902b32c94ca390a2e16eea8132bf8c2ed8f"
+    },
+    "signature": "0x16795379ca8e28953e74b23d1c384dda760579ad70c5e490225403664a8d4490cabb1dc64a2e0967b5f0c1e9dbd6578c00000000000000000000000000000000"
+  }
+}
 ```
 
 * **duplicateVote**
 
-```json 
+```text 
 {
-    "voteA":{
-        "epoch":0, 			//共识轮epoch值
-        "view_number":0,	//共识轮view值
-        "block_hash":"0xf41006b64e9109098723a37f9246a76c236cd97c67a334cfb4d54bc36a3f1306",
-        //区块hash
-        "block_number":500,		//区块number
-        "block_index":0,		//区块在一轮view中的索引值
-        "validate_node":{
-            "index":0,			//验证人在一轮epoch中的索引值
-            "address":"0x0550184a50db8162c0cfe9296f06b2b1db019331",		//验证人地址
-            "NodeID":"77fffc999d9f9403b65009f1eb27bae65774e2d8ea36f7b20a89f82642a5067557430e6edfe5320bb81c3666a19cf4a5172d6533117d7ebcd0f2c82055499050",		//验证人nodeID
-            "blsPubKey":"5ccd6b8c32f2713faa6c9a46e5fb61ad7b7400e53fabcbc56bdc0c16fbfffe09ad6256982c7059e7383a9187ad93a002a7cda7a75d569f591730481a8b91b5fad52ac26ac495522a069686df1061fc184c31771008c1fedfafd50ae794778811"		//验证人bls公钥
-        },
-        "signature":"0xa7205d571b16696b3a9b68e4b9ccef001c751d860d0427760f650853fe563f5191f2292dd67ccd6c89ed050182f19b9200000000000000000000000000000000"	//消息签名
-    }
- }
+  "voteA": {
+    "epoch": 0,   //共识轮epoch值
+    "viewNumber": 0,    //共识轮view值
+    "blockHash": "0x58b5976a471f86c4bd198984827bd594dce6ac861ef15bbbb1555e7b2edc2fc9",   //区块hash
+    "blockNumber": 16013,   //区块number
+    "blockIndex": 0,    //区块在一轮view中的索引值
+    "validateNode": { 
+      "index": 0,    //验证人在一轮epoch中的索引值
+      "address": "0xc30671be006dcbfd6d36bdf0dfdf95c62c23fad4",  //验证人地址
+      "nodeId": "19f1c9aa5140bd1304a3260de640a521c33015da86b88cd2ecc83339b558a4d4afa4bd0555d3fa16ae43043aeb4fbd32c92b34de1af437811de51d966dc64365",   //验证人nodeID
+      "blsPubKey": "f93a2381b4cbb719a83d80a4feb93663c7aa026c99f64704d6cc464ae1239d3486d0cf6e0b257ac02d5dd3f5b4389907e9d1d5b434d784bfd7b89e0822148c7f5b8e1d90057a5bbf4a0abf88bbb12902b32c94ca390a2e16eea8132bf8c2ed8f"    //验证人bls公钥
+    },
+    "signature": "0x071350aed09f226e218715357ffb7523ba41271dd1d82d4dded451ee6509cd71f6888263b0b14bdfb33f88c04f76790d00000000000000000000000000000000"    //消息签名
+  },
+  "voteB": {
+    "epoch": 0,
+    "viewNumber": 0,
+    "blockHash": "0x422515ca50b9aa01c46dffee53f3bef0ef29884bfd014c3b6170c05d5cf67696",
+    "blockNumber": 16013,
+    "blockIndex": 0,
+    "validateNode": {
+      "index": 0,
+      "address": "0xc30671be006dcbfd6d36bdf0dfdf95c62c23fad4",
+      "nodeId": "19f1c9aa5140bd1304a3260de640a521c33015da86b88cd2ecc83339b558a4d4afa4bd0555d3fa16ae43043aeb4fbd32c92b34de1af437811de51d966dc64365",
+      "blsPubKey": "f93a2381b4cbb719a83d80a4feb93663c7aa026c99f64704d6cc464ae1239d3486d0cf6e0b257ac02d5dd3f5b4389907e9d1d5b434d784bfd7b89e0822148c7f5b8e1d90057a5bbf4a0abf88bbb12902b32c94ca390a2e16eea8132bf8c2ed8f"
+    },
+    "signature": "0x9bf6c01643058c0c828c35dc3277666edd087cb439c5f6a78ba065d619f812fb42c5ee881400a7a42dd8366bc0c5c88100000000000000000000000000000000"
+  }
+}
 ```
 
 * **duplicateViewchange**
 
-```json
+```text
 {
-    "viewA":{
-        "epoch":0, 			//共识轮epoch值
-        "view_number":0,	//共识轮view值
-        "block_hash":"0xf41006b64e9109098723a37f9246a76c236cd97c67a334cfb4d54bc36a3f1306",
-        //区块hash
-        "block_number":500,		//区块number
-        "block_index":0,		//区块在一轮view中的索引值
-        "validate_node":{
-            "index":0,			//验证人在一轮epoch中的索引值
-            "address":"0x0550184a50db8162c0cfe9296f06b2b1db019331",		//验证人地址
-            "NodeID":"77fffc999d9f9403b65009f1eb27bae65774e2d8ea36f7b20a89f82642a5067557430e6edfe5320bb81c3666a19cf4a5172d6533117d7ebcd0f2c82055499050",		//验证人nodeID
-            "blsPubKey":"5ccd6b8c32f2713faa6c9a46e5fb61ad7b7400e53fabcbc56bdc0c16fbfffe09ad6256982c7059e7383a9187ad93a002a7cda7a75d569f591730481a8b91b5fad52ac26ac495522a069686df1061fc184c31771008c1fedfafd50ae794778811"		//验证人bls公钥
-        },
-        "signature":"0xa7205d571b16696b3a9b68e4b9ccef001c751d860d0427760f650853fe563f5191f2292dd67ccd6c89ed050182f19b9200000000000000000000000000000000"	//消息签名
-    }
- }
+  "viewA": {
+    "epoch": 0,  
+    "viewNumber": 0, 
+    "blockHash": "0xb84a40bb954e579716e7a6b9021618f6b25cdb0e0dd3d8c2c0419fe835640f36",  //区块hash
+    "blockNumber": 16013, 
+    "validateNode": {
+      "index": 0,  
+      "address": "0xc30671be006dcbfd6d36bdf0dfdf95c62c23fad4", 
+      "nodeId": "19f1c9aa5140bd1304a3260de640a521c33015da86b88cd2ecc83339b558a4d4afa4bd0555d3fa16ae43043aeb4fbd32c92b34de1af437811de51d966dc64365",
+      "blsPubKey": "f93a2381b4cbb719a83d80a4feb93663c7aa026c99f64704d6cc464ae1239d3486d0cf6e0b257ac02d5dd3f5b4389907e9d1d5b434d784bfd7b89e0822148c7f5b8e1d90057a5bbf4a0abf88bbb12902b32c94ca390a2e16eea8132bf8c2ed8f"
+    },
+    "signature": "0x9c8ba2654c6b8334b1b94d3b421c5901242973afcb9d87c4ab6d82c2aee8e212a08f2ae000c9203f05f414ca578cda9000000000000000000000000000000000",
+    "blockEpoch": 0,
+    "blockView": 0
+  },
+  "viewB": {
+    "epoch": 0,
+    "viewNumber": 0,
+    "blockHash": "0x2a60ed6f04ccb9e468fbbfdda98b535653c42a16f1d7ccdfbd5d73ae1a2f4bf1",
+    "blockNumber": 16013,
+    "validateNode": {
+      "index": 0,
+      "address": "0xc30671be006dcbfd6d36bdf0dfdf95c62c23fad4",
+      "nodeId": "19f1c9aa5140bd1304a3260de640a521c33015da86b88cd2ecc83339b558a4d4afa4bd0555d3fa16ae43043aeb4fbd32c92b34de1af437811de51d966dc64365",
+      "blsPubKey": "f93a2381b4cbb719a83d80a4feb93663c7aa026c99f64704d6cc464ae1239d3486d0cf6e0b257ac02d5dd3f5b4389907e9d1d5b434d784bfd7b89e0822148c7f5b8e1d90057a5bbf4a0abf88bbb12902b32c94ca390a2e16eea8132bf8c2ed8f"
+    },
+    "signature": "0xed69663fb943ce0e0dd90df1b65e96514051e82df48b3867516cc7e505234b9ca707fe43651870d9141354a7a993e09000000000000000000000000000000000",
+    "blockEpoch": 0,
+    "blockView": 0
+  }
+}
 ```
 
 * **返回值**
@@ -2476,7 +2663,126 @@ YourSmartContract contract = YourSmartContract.deploy(
 
 ```java
 YourSmartContract contract = YourSmartContract.load(
-        "0x<address>|<ensName>", web3j, transactionManager, contractGasProvider);
+        "0x<address>", web3j, transactionManager, contractGasProvider);
+```
+
+#### 智能合约有效性
+
+使用此方法，可以验证智能合约的有效性。只有在合约地址中部署的字节码与智能合约封装包中的字节码匹配时才会返回`true`。
+
+```java
+contract.isValid();  // returns false if the contract bytecode does not match what's deployed
+                     // at the provided address
+```
+
+#### 交易管理器
+Java SDK提供了一个交易管理器`TransactionManager`来控制你连接到PlatON客户端的方式。默认采用`RawTransactionManager`。
+`RawTransactionManager`需要指定链ID。防止一个链的交易被重新广播到另一个链上：
+
+```java
+TransactionManager transactionManager = new RawTransactionManager(web3j, credentials, 100L);
+```
+
+你可以通过以下请求来获得链ID：
+
+```java
+web3j.netVersion().send().getNetVersion();
+```
+
+除了`RawTransactionManager`之外，Java SDK还提供了一个客户端交易管理器`ClientTransactionManager`，它将你的交易签名工作交给你正在连接的PlatON客户端。
+此外，还有一个`ReadonlyTransactionManager`，用于只从智能合约中查询数据，而不与它进行交易。
+
+#### 调用交易和事件
+对于所有交易的方法，只返回与交易关联的交易收据。
+
+```java
+TransactionReceipt transactionReceipt = contract.someMethod(<param1>, ...).send();
+```
+
+通过交易收据，可以提取索引和非索引的事件参数。
+
+```java
+List<SomeEventResponse> events = contract.getSomeEvents(transactionReceipt);
+```
+
+或者，你可以使用可观察的过滤器Observable filter，监听与智能合约相关联的事件：
+
+```java
+contract.someEventObservable(startBlock, endBlock).subscribe(event -> ...);
+```
+
+#### 调用常量方法
+
+常量方法只做查询，而不改变智能合约的状态。
+
+```java
+Type result = contract.someMethod(<param1>, ...).send();
+```
+
+## Wasm合约调用
+
+将Wasm智能合约部署到区块链上时，必须先将其编译成字节码的格式，然后将其作为交易的一部分发送。Java SDK 将帮你生成Wasm智能合约对应的Java包装类，可以方便的部署Wasm智能合约以及调用Wasm智能合约中的交易方法、事件和常量方法。
+
+### 编译Wasm合约源代码
+
+* 通过`CDT`编译器编译Wasm合约源代码([CDT下载](https://github.com/PlatONnetwork/PlatON-CDT))
+
+CDT安装成功以后，可通过如下命令编译Wasm合约源代码：
+
+```shell
+$ platon-cpp <contract>.cpp 
+```
+
+编译成功以后，会生成`<contract>.wasm`和`<contract>.abi.json`文件
+`wasm`，输出Wasm合约的二进制文件以提供交易请求。
+`abi.json`，详细描述了所有可公开访问的合约方法及其相关参数。`abi`文件也用于生成Wasm智能合约对应的Java包装类。
+
+* 使用`platon-truffle`编译Wasm合约源代码([platon-truffle开发工具安装参考](https://github.com/PlatONnetwork/platon-truffle/tree/feature/wasm)|[platon-truffle开发工具使用手册](https://platon-truffle.readthedocs.io/en/v0.1.0/index.html))
+
+### Wasm智能合约Java包装类
+
+Java SDK支持从`abi.json`文件中自动生成Wasm智能合约对应的Java包装类。
+
+* 通过命令行工具生成Java包装类：
+
+```shell
+$ platon-web3j wasm generate /path/to/<smart-contract>.wasm /path/to/<smart-contract>.abi.json -o /path/to/src/main/java -p com.your.organisation.name
+```
+
+* 直接调用Java SDK中的工具类生成Java包装类：
+
+```java
+String args[] = {"generate", "/path/to/<smart-contract>.wasm", "/path/to/<smart-contract>.abi.json", "-o", "/path/to/src/main/java", "-p" , "com.your.organisation.name"};
+org.web3j.codegen.WasmFunctionWrapperGenerator.run(args);
+```
+
+其中`wasm`和`abi.json`文件是编译wasm源代码以后生成的。
+
+Wasm智能合约对应的Java包装类支持的主要功能：
+- 构建与部署
+- 确定合约有效性
+- 调用交易和事件
+- 调用常量方法
+
+#### 构建与部署智能合约
+
+智能合约的构建和部署使用包装类中的deploy方法：
+
+```java
+YourSmartContract contract = YourSmartContract.deploy(
+        <web3j>, <transactionManager>, contractGasProvider,
+        [<initialValue>,] <param1>, ..., <paramN>).send();
+```
+
+这个方法将在区块链上部署智能合约。部署成功以后，它将会返回一个智能合约的包装类实例，包含智能合约的地址。
+
+如果你的智能合约在构造上接受LAT转账，则需要初始化参数值<initialValue>。
+
+通过智能合约的地址也可以创建智能合约对应的Java包装类的实例：
+
+```java
+YourSmartContract contract = YourSmartContract.load(
+        "0x<address>", web3j, transactionManager, contractGasProvider);
 ```
 
 #### 智能合约有效性
