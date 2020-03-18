@@ -172,7 +172,7 @@ Reset().
 If more functionality or invariants are required, a class is more appropriate.
 If in doubt, make it a class.
 
-## Inheritance
+### Inheritance
 
 Composition is often more appropriate than inheritance. When using inheritance,
 make it `public`.
@@ -184,7 +184,7 @@ Do not overuse implementation inheritance. Composition is often more
 appropriate. Try to restrict use of inheritance to the "is-a" case: Bar
 subclasses Foo if it can reasonably be said that Bar "is a kind of" Foo.
 
-## Multiple Inheritance
+### Multiple Inheritance
 
 Multiple inheritance is especially problematic, because it often imposes a
 higher performance overhead (in fact, the performance drop from single
@@ -195,7 +195,7 @@ outright bugs.
 
 **Multiple implementation inheritance is strongly discouraged.**
 
-## move
+### move
 
 The `std::move` introduced in C++11 can effectively transfer resources to other
 objects. In our practice, use `std :: move` can effectively reduce the
@@ -223,8 +223,12 @@ for (auto it = my_map.begin(); it != my_map.end(); it++) {
 }
 ```
 
-## Reference Arguments
+### Reference Arguments
 
 Suggest using reference arguments as function parameters. Reference parameters
 can reduce unnecessary replication and reduce unnecessary memory allocation. For us
 WASM virtual machines, memory allocation is an expensive operation.
+
+### Containers
+
+The C ++ standard library provides some commonly used containers (map, vector, list, etc.), and you should carefully read the corresponding interface documentation when using it. It is important to note that the `operator[]` oper ator of map, according to the interface documentation, when the key does not exist, the insert action will be performed. For contract development, when using `StorageType` to store the map, do not use` operator [] `to determine whether the key exists, but use` find () ` .
