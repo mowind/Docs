@@ -23,15 +23,18 @@ In the PlatON network, the maximum gas limit is `100,800,000` and the minimum is
 
 **LAT Unit Conversion**
 
-| Unit | VON Value | VON                       |
-|------|-----------|---------------------------|
-| VON  | 1         | 1                         |
-| kVON | 1e3 VON   | 1,000                     |
-| mVON | 1e6 VON   | 1,000,000                 |
-| gVON | 1e9 VON   | 1,000,000,000             |
-| uLAT | 1e12 VON  | 1,000,000,000,000         |
-| mLAT | 1e15 VON  | 1,000,000,000,000,000     |
-| LAT  | 1e18 VON  | 1,000,000,000,000,000,000 |
+| Unit     | VON Value | VON                                   |
+|----------|-----------|---------------------------------------|
+| VON      | 1         | 1                                     |
+| kVON     | 1e3 VON   | 1,000                                 |
+| mVON     | 1e6 VON   | 1,000,000                             |
+| gVON     | 1e9 VON   | 1,000,000,000                         |
+| microLAT | 1e12 VON  | 1,000,000,000,000                     |
+| milliLAT | 1e15 VON  | 1,000,000,000,000,000                 |
+| LAT      | 1e18 VON  | 1,000,000,000,000,000,000             |
+| kLAT     | 1e21 VON  | 1,000,000,000,000,000,000,000         |
+| mLAT     | 1e24 VON  | 1,000,000,000,000,000,000,000,000     |
+| gLAT     | 1e27 VON  | 1,000,000,000,000,000,000,000,000,000 |
 
 # Avoid Timeouts
 
